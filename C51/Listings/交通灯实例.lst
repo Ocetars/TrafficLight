@@ -1,0 +1,24 @@
+C51 COMPILER V9.59.0.0   __________                                                        02/27/2024 10:00:24 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE __________
+OBJECT MODULE PLACED IN .\Objects\交通灯实例.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE 147-交通灯测试\交通灯实例.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\includes) 
+                    -DEBUG OBJECTEXTEND PRINT(.\Listings\交通灯实例.lst) TABS(2) OBJECT(.\Objects\交通灯实例.obj)
+
+line level    source
+
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    199    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      4    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

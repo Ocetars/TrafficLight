@@ -1,0 +1,200 @@
+C51 COMPILER V9.59.0.0   TRAFFICLIGHT                                                      02/27/2024 16:37:45 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE TRAFFICLIGHT
+OBJECT MODULE PLACED IN .\Objects\trafficLight.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE trafficLight.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\includes) DEBUG OBJECTE
+                    -XTEND PRINT(.\Listings\trafficLight.lst) TABS(2) OBJECT(.\Objects\trafficLight.obj)
+
+line level    source
+
+   1          /*-----------------------------------------------
+   2            Name: Traffic Light new23
+   3            Forum: www.doflye.net
+   4            Written by: shifang
+   5            Date: 2009.5
+   6            Modification: None
+   7            Content:  1. Purpose of the program: Use timer to learn the principle of countdown traffic light
+   8                          The main program is the same as the countdown
+   9                      2. Hardware requirements: Digital tube, 12M crystal
+  10                      3. P1 port is connected to LED for traffic light display
+  11                      4. Digital tube is used to display time
+  12          ------------------------------------------------*/
+  13          #include <reg52.h> // Include header file, generally no need to change,
+  14          // The header file includes the definition of special function registers
+  15          
+  16          sbit LACTCH1 = P2 ^ 2;
+  17          sbit LACTCH2 = P2 ^ 3;
+  18          sbit LACTCH3 = P2 ^ 2; // New latch
+  19          sbit LACTCH4 = P2 ^ 3;
+  20          /*------------------------------------------------
+  21                          Global Variables
+  22          ------------------------------------------------*/
+  23          bit redAflag, greenAflag, yellowAflag, turnRedAflag, new; // Define red, green, yellow light flag bits
+  24          bit redBflag, greenBflag, yellowBflag, turnRedBflag; // Define red, green, yellow light flag bits
+  25          
+  26          redA = 0X7F; // Define red light
+  27          yellowA = 0XBF; // Define yellow light
+  28          greenA = 0XDF; // Define green light
+  29          redB = 0XF7; // Define red light
+  30          yellowB = 0XFB; // Define yellow light
+  31          greenB = 0XFD; // Define green light
+  32          
+  33          
+  34          code unsigned char tab[] =
+  35              {0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f};
+  36          // Common cathode digital tube 0-9
+  37          
+  38          unsigned char Dis_Shiwei; // Define tens place
+  39          unsigned char Dis_Gewei;  // Define ones place
+  40          unsigned char Dis_ShiweiB;
+  41          unsigned char Dis_GeweiB;
+  42          /*------------------------------------------------
+  43          
+  44          ------------------------------------------------*/
+  45          void delay(unsigned int cnt)
+  46          {
+  47   1        while (--cnt)
+  48   1          ;
+  49   1      }
+  50          /*------------------------------------------------
+  51                        Main Program
+  52          ------------------------------------------------*/
+  53          main()
+  54          {
+C51 COMPILER V9.59.0.0   TRAFFICLIGHT                                                      02/27/2024 16:37:45 PAGE 2   
+
+  55   1        TMOD |= 0x01; // Timer setting 10ms in 12M crystal
+  56   1        TH0 = 0xd8;
+  57   1        TL0 = 0xf0;
+  58   1        IE = 0x82; // Open interrupt
+  59   1        TR0 = 1;
+  60   1      
+  61   1        // P1 = greenA; // Green light on
+  62   1        P1 = 0XD7;
+  63   1        yellowAflag = 1 ;
+  64   1        while (1)
+  65   1        {
+  66   2          P0 = Dis_Shiwei; // Display tens place
+  67   2          LACTCH1 = 1;     // Latch
+  68   2          LACTCH1 = 0;
+  69   2          P0 = 0xfe;
+  70   2          LACTCH2 = 1; // Latch
+  71   2          LACTCH2 = 0;
+  72   2          delay(300);     // Short delay
+  73   2          P0 = Dis_Gewei; // Display ones place
+  74   2          LACTCH1 = 1;    // Latch
+  75   2          LACTCH1 = 0;
+  76   2          P0 = 0xfd;
+  77   2          LACTCH2 = 1; // Latch
+  78   2          LACTCH2 = 0;
+  79   2          delay(300);
+  80   2          P0 = Dis_ShiweiB; // Display tens place
+  81   2          LACTCH3 = 1;      // Latch
+  82   2          LACTCH3 = 0;
+  83   2          P0 = 0xef;
+  84   2          LACTCH4 = 1; // Latch
+  85   2          LACTCH4 = 0;
+  86   2          delay(300);      // Short delay
+  87   2          P0 = Dis_GeweiB; // Display ones place
+  88   2          LACTCH3 = 1;     // Latch
+  89   2          LACTCH3 = 0;
+  90   2          P0 = 0xdf;
+  91   2          LACTCH4 = 1; // Latch
+  92   2          LACTCH4 = 0;
+  93   2          delay(300);
+  94   2        }
+  95   1      }
+  96          /*------------------------------------------------
+  97                      Timer 0 Interrupt Function
+  98          ------------------------------------------------*/
+  99          void tim(void) interrupt 1
+ 100          {
+ 101   1        static unsigned char second = 30, count; // Initial value 99 A is green first
+ 102   1        static unsigned char secondB = 30; // Initial value for second traffic light system
+ 103   1        TH0 = 0xd8; // Reassign
+ 104   1        TL0 = 0xf0;
+ 105   1        count++;
+ 106   1        if (count == 100)
+ 107   1        {
+ 108   2          count = 0;
+ 109   2          second--; // Second minus 1
+ 110   2          secondB--; 
+ 111   2          if (second == 0)
+ 112   2          {
+ 113   3            if (yellowAflag)
+ 114   3            {
+ 115   4              second = 5;
+ 116   4              secondB = 5;
+C51 COMPILER V9.59.0.0   TRAFFICLIGHT                                                      02/27/2024 16:37:45 PAGE 3   
+
+ 117   4              // P1 = yellowA; // Yellow light on for 5 seconds
+ 118   4              P1 = 0XB7;
+ 119   4      
+ 120   4              // turnRedAflag = 0;
+ 121   4              redAflag = 1;
+ 122   4              yellowAflag = 0;
+ 123   4              greenAflag = 1;
+ 124   4            }
+ 125   3            else if (redAflag)
+ 126   3            {
+ 127   4              second = 15;
+ 128   4              secondB = 15;
+ 129   4              // P1 = redA; // Red light on for 3 seconds
+ 130   4              P1 = 0X7D;
+ 131   4      
+ 132   4              turnRedAflag = 1;
+ 133   4              redAflag = 0;
+ 134   4              yellowAflag = 0;
+ 135   4              greenAflag = 1;
+ 136   4            }
+ 137   3            else if (turnRedAflag)
+ 138   3            {
+ 139   4              second = 5;
+ 140   4              secondB = 5;
+ 141   4              P1 = 0X7B; // Red light on for 5 seconds
+ 142   4      
+ 143   4              redAflag = 0;
+ 144   4              turnRedAflag = 0;
+ 145   4              yellowAflag = 0;
+ 146   4              greenAflag = 0;
+ 147   4              new = 1;
+ 148   4            }
+ 149   3            else if (new)
+ 150   3            {
+ 151   4              second = 30;
+ 152   4              secondB = 35;
+ 153   4              P1 = 0XD7; // A green, B red
+ 154   4      
+ 155   4              redAflag = 0;
+ 156   4              yellowAflag = 1;
+ 157   4              greenAflag = 0;
+ 158   4              new = 0;
+ 159   4            }
+ 160   3            
+ 161   3      
+ 162   3          }
+ 163   2          Dis_Shiwei = tab[second / 10]; // Processing tens place display value
+ 164   2          Dis_Gewei = tab[second % 10];  // Processing ones place display value
+ 165   2          Dis_ShiweiB = tab[secondB / 10]; // Processing tens place display value for second traffic light syste
+             -m
+ 166   2          Dis_GeweiB = tab[secondB % 10];  // Processing ones place display value for second traffic light syste
+             -m  
+ 167   2        }
+ 168   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    272    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     19    ----
+C51 COMPILER V9.59.0.0   TRAFFICLIGHT                                                      02/27/2024 16:37:45 PAGE 4   
+
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      9    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
