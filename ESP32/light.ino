@@ -37,32 +37,31 @@ void countdown(String colorA, int secondsA, String colorB, int secondsB) {
     if (Serial.available() > 0)
     {
       // 有可读数据，读取1字节
-      // incomingByte = Serial.read();
-      // if (incomingByte == 49) {
-      //   counterA = 0;
-      //   counterB = 0;
-      // }
+      incomingByte = Serial.read();
+      if (incomingByte == 49) {
+        Serial.print("A道行人按键被按下");
+      }
       // 看看你收到的数据是什么
-      Serial.print("A道行人按键被按下");
       // Serial.println(incomingByte);
-      // 关闭所有通道
-      digitalWrite(RED_A, LOW);
-      digitalWrite(RED_B, LOW);
-      digitalWrite(YELLOW_A, LOW);
-      digitalWrite(YELLOW_B, LOW);
-      digitalWrite(GREEN_A, LOW);
-      digitalWrite(GREEN_B, LOW);
+      
+      // // 关闭所有通道
+      // digitalWrite(RED_A, LOW);
+      // digitalWrite(RED_B, LOW);
+      // digitalWrite(YELLOW_A, LOW);
+      // digitalWrite(YELLOW_B, LOW);
+      // digitalWrite(GREEN_A, LOW);
+      // digitalWrite(GREEN_B, LOW);
 
-      // 按钮被按下，B道黄灯亮5s后转为红灯，A道黄灯5s后转为绿灯
-      digitalWrite(YELLOW_B, HIGH);
-      digitalWrite(YELLOW_A, HIGH);
-      delay(5000);
-      digitalWrite(YELLOW_B, LOW);
-      digitalWrite(YELLOW_A, LOW);
-      digitalWrite(RED_B, HIGH);
-      digitalWrite(GREEN_A, HIGH);
-      delay(10000);
-      resetFunc();
+      // // 按钮被按下，B道黄灯亮5s后转为红灯，A道黄灯5s后转为绿灯
+      // digitalWrite(YELLOW_B, HIGH);
+      // digitalWrite(YELLOW_A, HIGH);
+      // delay(5000);
+      // digitalWrite(YELLOW_B, LOW);
+      // digitalWrite(YELLOW_A, LOW);
+      // digitalWrite(RED_B, HIGH);
+      // digitalWrite(GREEN_A, HIGH);
+      // delay(10000);
+      // resetFunc();
     }
 
   }
