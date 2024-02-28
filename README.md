@@ -2,7 +2,8 @@
 
 ## C51模拟交通灯信号控制
 
-***导入hex文件请见目录***```C51/Objects/lights.hex```
+***导入hex文件请见目录***```C51/Objects/lights.hex```  
+下载文件请见Release ~~(在界面右侧)~~
 
 ### 功能实现
 
