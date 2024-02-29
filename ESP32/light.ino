@@ -5,9 +5,10 @@
 #define YELLOW_B 8
 #define GREEN_B 6
 int incomingByte = 0; // 定义变量用于接收串口数据
-void(* resetFunc) (void) = 0;
+void (*resetFunc)(void) = 0;
 
-void setup() {
+void setup()
+{
   pinMode(RED_A, OUTPUT);
   pinMode(YELLOW_A, OUTPUT);
   pinMode(GREEN_A, OUTPUT);
@@ -17,11 +18,14 @@ void setup() {
   Serial.begin(9600);
 }
 
-void countdown(String colorA, int secondsA, String colorB, int secondsB) {
+void countdown(String colorA, int secondsA, String colorB, int secondsB)
+{
   int counterA = secondsA;
   int counterB = secondsB;
-  while (counterA > 0 && counterB > 0) {
-    if (counterA < 0 || counterB < 0) break;
+  while (counterA > 0 && counterB > 0)
+  {
+    if (counterA < 0 || counterB < 0)
+      break;
     Serial.print("通道A: ");
     Serial.print(counterA > 0 ? colorA : "红灯");
     Serial.print(", 剩余秒数: ");
@@ -32,46 +36,76 @@ void countdown(String colorA, int secondsA, String colorB, int secondsB) {
     Serial.print(", 剩余秒数: ");
     Serial.println(counterB > 0 ? counterB : 0);
     delay(1000);
-    if (counterA > 0) counterA--;
-    if (counterB > 0) counterB--;
+    if (counterA > 0)
+      counterA--;
+    if (counterB > 0)
+      counterB--;
     if (Serial.available() > 0)
     {
       // 有可读数据，读取1字节
       incomingByte = Serial.read();
-      if (incomingByte == 49) {
-        Serial.print("A道行人按键被按下");
+      if (incomingByte == 49)
+      {
+        Serial.println("A道行人按键被按下");
+        // 关闭所有通道
+        digitalWrite(RED_A, LOW);
+        digitalWrite(RED_B, LOW);
+        digitalWrite(YELLOW_A, LOW);
+        digitalWrite(YELLOW_B, LOW);
+        digitalWrite(GREEN_A, LOW);
+        digitalWrite(GREEN_B, LOW);
+
+        // 按钮被按下，B道黄灯亮5s后转为红灯，A道黄灯5s后转为绿灯
+        digitalWrite(YELLOW_B, HIGH);
+        digitalWrite(YELLOW_A, HIGH);
+        Serial.println("请等待5秒黄灯...");
+        delay(5000);
+        digitalWrite(YELLOW_A, LOW);
+        digitalWrite(YELLOW_B, LOW);
+        resetFunc();
       }
-      // 看看你收到的数据是什么
-      // Serial.println(incomingByte);
-      
-      // // 关闭所有通道
-      // digitalWrite(RED_A, LOW);
-      // digitalWrite(RED_B, LOW);
-      // digitalWrite(YELLOW_A, LOW);
-      // digitalWrite(YELLOW_B, LOW);
-      // digitalWrite(GREEN_A, LOW);
-      // digitalWrite(GREEN_B, LOW);
+      else if (incomingByte == 50)
+      {
+        Serial.println("紧急按钮被按下,请等待5秒黄灯...");
+        // 关闭所有通道
+        digitalWrite(RED_A, LOW);
+        digitalWrite(RED_B, LOW);
+        digitalWrite(YELLOW_A, LOW);
+        digitalWrite(YELLOW_B, LOW);
+        digitalWrite(GREEN_A, LOW);
+        digitalWrite(GREEN_B, LOW);
 
-      // // 按钮被按下，B道黄灯亮5s后转为红灯，A道黄灯5s后转为绿灯
-      // digitalWrite(YELLOW_B, HIGH);
-      // digitalWrite(YELLOW_A, HIGH);
-      // delay(5000);
-      // digitalWrite(YELLOW_B, LOW);
-      // digitalWrite(YELLOW_A, LOW);
-      // digitalWrite(RED_B, HIGH);
-      // digitalWrite(GREEN_A, HIGH);
-      // delay(10000);
-      // resetFunc();
+        // 按钮被按下，A道黄灯亮5s后转为红灯，B道黄灯5s后转为绿灯
+        digitalWrite(YELLOW_A, HIGH);
+        digitalWrite(YELLOW_B, HIGH);
+        delay(5000);
+        digitalWrite(YELLOW_A, LOW);
+        digitalWrite(YELLOW_B, LOW);
+        digitalWrite(RED_A, HIGH);
+        digitalWrite(RED_B, HIGH);
+        Serial.println("车辆紧急通过中...请等待5秒");
+        delay(5000);
+        digitalWrite(RED_A, LOW);
+        digitalWrite(RED_B, LOW);
+        resetFunc();
+      }
+      else if (incomingByte == 51)
+      {
+        // 如果按键3被按下，那么增加AB两车道的倒计时
+        Serial.println("车流量过大,延长10秒绿灯");
+        counterA += 10;
+        counterB += 10;
+      }
     }
-
   }
 }
 
-void loop() {
+void loop()
+{
   // 南北通道A绿灯亮30s，东西通道B红灯亮35s
   digitalWrite(GREEN_A, HIGH);
   digitalWrite(RED_B, HIGH);
-  countdown("绿灯", 10, "红灯", 15);
+  countdown("绿灯", 30, "红灯", 35);
 
   // 南北通道A黄灯亮5s，东西通道B红灯亮
   digitalWrite(GREEN_A, LOW);
